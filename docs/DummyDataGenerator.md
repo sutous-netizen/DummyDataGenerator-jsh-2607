@@ -20,7 +20,7 @@ src/
   main.cpp               # CLI 진입점 (옵션 파싱, 실행)
 data/                    # 실행 시 생성되는 JSON 산출물 (gitignore 대상)
 docs/
-  DESIGN.md              # 본 문서
+  DummyDataGenerator.md  # 본 문서
 ```
 
 ## 데이터 모델
@@ -83,6 +83,22 @@ DummyDataGenerator.exe [--samples N] [--orders N] [--seed N] [--out DIR]
 직접 실행하여 `data/samples.json`, `data/orders.json`이 sampleId로 서로 참조되도록 올바르게
 생성되는 것을 확인했다. 소스 파일은 한글 리터럴을 포함하므로 프로젝트 설정에 `/utf-8` 컴파일 옵션을
 추가해 MSVC가 UTF-8로 소스를 해석하도록 했다.
+
+### 콘솔 한글 출력 깨짐 이슈
+
+소스/컴파일 옵션을 UTF-8로 맞춰도, 한국어 Windows의 기본 콘솔 코드페이지(CP949)에서 실행하면
+`std::cout`이 내보내는 UTF-8 바이트를 CP949로 잘못 해석해 한글이 깨져 보인다. 이를 해결하기 위해
+`main()` 시작 시 Windows API로 콘솔 입출력 코드페이지를 UTF-8로 전환한다.
+
+```cpp
+#if defined(_WIN32)
+SetConsoleOutputCP(CP_UTF8);
+SetConsoleCP(CP_UTF8);
+#endif
+```
+
+이 설정 이후에는 콘솔의 기본 코드페이지(949)와 무관하게 한글이 정상 출력됨을 `chcp 949` 상태에서
+직접 실행하여 확인했다.
 
 ## 후속 프로젝트(SampleOrderSystem)와의 연계
 

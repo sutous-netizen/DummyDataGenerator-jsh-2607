@@ -1,6 +1,10 @@
-#include <chrono>
+﻿#include <chrono>
 #include <iostream>
 #include <string>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 #include "DummyDataGenerator.h"
 
@@ -48,6 +52,13 @@ Options ParseArgs(int argc, char* argv[]) {
 } // namespace
 
 int main(int argc, char* argv[]) {
+#if defined(_WIN32)
+    // 소스 리터럴은 UTF-8로 컴파일되지만, 콘솔 코드페이지가 CP949(한국어)인 경우
+    // 그대로 출력하면 한글이 깨진다. 콘솔 입출력 코드페이지를 UTF-8로 맞춘다.
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     try {
         const Options options = ParseArgs(argc, argv);
 
